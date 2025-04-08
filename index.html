@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Happy Birthday Priya 🎂</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #ffe3e3, #ffd6e0);
+      font-family: 'Segoe UI', sans-serif;
+      color: #333;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-top: 40px;
+      color: #d6336c;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .scratch-container {
+      position: relative;
+      width: 320px;
+      height: 160px;
+      margin: 30px auto;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .hidden-message {
+      background: #fffafc;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: #6a0572;
+      padding: 10px;
+      text-align: center;
+    }
+
+    canvas#scratchCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #poemSection {
+      display: none;
+      margin-top: 40px;
+      background: #fff0f6;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      animation: fadeIn 2s ease-in;
+    }
+
+    #finalBtn {
+      margin-top: 20px;
+      padding: 12px 28px;
+      font-size: 18px;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+
+    #finalBtn:hover {
+      background-color: #ff1493;
+    }
+
+    canvas#confetti-canvas, canvas#balloons {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+  <canvas id="balloons"></canvas>
+
+  <div class="container">
+    <h1>Happy Birthday, Priya 🎉</h1>
+    <p>This is a small surprise from your friend Vishal 🥳</p>
+
+    <div class="scratch-container">
+      <div class="hidden-message" id="hiddenMsg">
+        🎁 You're Special, Priya 💖<br>Touch to reveal your friendship gift!
+      </div>
+      <canvas id="scratchCanvas" width="320" height="160"></canvas>
+    </div>
+
+    <div id="poemSection">
+      <h2>🌟 English Poem</h2>
+      <p><em>
+        In every smile, in every cheer,<br>
+        I'm glad I’ve found a friend so dear.<br>
+        Through thick and thin, we laugh and grow,<br>
+        With you, life feels like a radiant glow. 🌈
+      </em></p>
+
+      <h2>🪔 தமிழ் கவிதை</h2>
+      <p><em>
+        சிரிப்புகள் மட்டும் வாழ்வின் அணி,<br>
+        நட்பின் பெயரில் பிறந்ததடி நீ!<br>
+        நினைவில் உன் பெயர் நிலா போலே,<br>
+        நிலவொளியாய் என் வாழ்வை தெளிவாக்கினாய்! 🌙
+      </em></p>
+
+      <h2>💌 A Final Note</h2>
+      <p><strong>Will you be my friend forever, Priya? 💛</strong></p>
+      <button id="finalBtn" onclick="sendResult()">Yes, always 🤗</button>
+    </div>
+  </div>
+
+  <audio autoplay loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    const canvas = document.getElementById("scratchCanvas");
+    const ctx = canvas.getContext("2d");
+    let isDrawing = false;
+
+    function setupScratch() {
+      ctx.fillStyle = "#cccccc";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = "destination-out";
+
+      canvas.addEventListener("mousedown", () => isDrawing = true);
+      canvas.addEventListener("mouseup", () => isDrawing = false);
+      canvas.addEventListener("mousemove", scratch);
+      canvas.addEventListener("touchstart", () => isDrawing = true);
+      canvas.addEventListener("touchend", () => isDrawing = false);
+      canvas.addEventListener("touchmove", scratchTouch);
+    }
+
+    function scratch(e) {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, 2 * Math.PI);
+      ctx.fill();
+      checkScratchProgress();
+    }
+
+    function scratchTouch(e) {
+      e.preventDefault();
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      ctx.beginPath();
+      ctx.arc(x, y, 25, 0, 2 * Math.PI);
+      ctx.fill();
+      checkScratchProgress();
+    }
+
+    function checkScratchProgress() {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      let cleared = 0;
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        if (imageData.data[i + 3] === 0) cleared++;
+      }
+      const percent = (cleared / (canvas.width * canvas.height)) * 100;
+      if (percent > 60) revealPoem();
+    }
+
+    function revealPoem() {
+      document.getElementById("poemSection").style.display = "block";
+      launchConfetti();
+      launchBalloons();
+    }
+
+    function launchConfetti() {
+      const duration = 6000;
+      const end = Date.now() + duration;
+      (function frame() {
+        confetti({
+          particleCount: 2,
+          angle: 60,
+          spread: 30,
+          startVelocity: 10,
+          origin: { x: 0 },
+        });
+        confetti({
+          particleCount: 2,
+          angle: 120,
+          spread: 30,
+          startVelocity: 10,
+          origin: { x: 1 },
+        });
+        if (Date.now() < end) {
+          setTimeout(() => requestAnimationFrame(frame), 250); // Slower effect
+        }
+      })();
+    }
+
+    function launchBalloons() {
+      const canvas = document.getElementById("balloons");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const balloons = [];
+
+      for (let i = 0; i < 20; i++) {
+        balloons.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height + Math.random() * 300,
+          r: 20 + Math.random() * 20,
+          color: `hsl(${Math.random() * 360}, 70%, 70%)`,
+          speed: 1 + Math.random() * 2,
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        balloons.forEach(b => {
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
+          ctx.fillStyle = b.color;
+          ctx.fill();
+          b.y -= b.speed;
+          if (b.y + b.r < 0) b.y = canvas.height + Math.random() * 100;
+        });
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    }
+
+    function sendResult() {
+      const message = {
+        to: "vishalvd006@gmail.com",
+        subject: "Priya clicked 'Yes!' for friendship 🎉",
+        body: "Priya has confirmed lifelong friendship. Mission success!"
+      };
+      console.log("📩 Simulated message sent:", message);
+      alert("Thank you Priya! 💖 Message recorded.");
+    }
+
+    setupScratch();
+  </script>
+</body>
+</html>
